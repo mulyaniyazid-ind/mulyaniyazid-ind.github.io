@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading Comprehension Challenge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .timer {
+            background: #ff6b6b;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 18px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .score-board {
+            background: #4ecdc4;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            display: inline-block;
+            margin-left: 20px;
+        }
+
+        .game-area {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .passage {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            border-left: 4px solid #667eea;
+        }
+
+        .passage h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .question-container {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .question-container:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .question {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option {
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            background: #e3f2fd;
+            border-color: #667eea;
+        }
+
+        .option input[type="radio"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .next-btn, .start-btn, .restart-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .next-btn:hover, .start-btn:hover, .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .start-screen {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .start-screen h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .instructions {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .instructions h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .results-screen {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .results-screen h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .final-score {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .performance-feedback {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="timer" id="timer">Time: 30:00</div>
+            <div class="score-board" id="scoreBoard">Score: 0/0</div>
+            <div class="progress-bar">
+                <div class="progress" id="progressBar" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="startScreen" class="game-area start-screen">
+            <h2>📚 Reading Comprehension Challenge</h2>
+            <div class="instructions">
+                <h3>Instructions:</h3>
+                <ul>
+                    <li>Read each passage carefully</li>
+                    <li>Answer multiple choice questions based on the text</li>
+                    <li>You have 30 minutes to complete all questions</li>
+                    <li>Immediate feedback will be provided for each answer</li>
+                    <li>Try to answer all questions to get your final score</li>
+                </ul>
+            </div>
+            <button class="start-btn" onclick="startGame()" style="display: inline-block;">Start Game</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="game-area hidden">
+            <div id="passageContainer"></div>
+            <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question</button>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="resultsScreen" class="game-area results-screen">
+            <h2>🎉 Game Complete!</h2>
+            <div class="final-score" id="finalScore"></div>
+            <div class="performance-feedback" id="performanceFeedback"></div>
+            <button class="restart-btn" onclick="restartGame()" style="display: inline-block;">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        let score = 0;
+        let totalQuestions = 0;
+        let timeLeft = 1800; // 30 minutes in seconds
+        let timer;
+        let gameData = [];
+
+        // Game data with passages and questions
+        const passages = [
+            {
+                title: "The Mystery of the Vanishing Bees",
+                text: "For the past decade, scientists have been puzzled by a phenomenon known as Colony Collapse Disorder (CCD). Entire bee colonies abandon their hives, leaving behind honey, larvae, and even their queen. This mysterious disappearance has serious implications for agriculture, as bees pollinate about one-third of the food we eat. Researchers have identified several potential causes: pesticides, disease, climate change, and habitat loss. However, no single factor appears to be responsible. The loss of bee colonies has economic consequences too, with crop yields declining in affected areas. Beekeepers and farmers are working together to find solutions, including creating bee-friendly environments and reducing pesticide use.",
+                questions: [
+                    {
+                        question: "What is Colony Collapse Disorder?",
+                        options: [
+                            "A disease that kills queen bees",
+                            "When entire bee colonies abandon their hives",
+                            "A type of pesticide that harms bees",
+                            "When bees produce too much honey"
+                        ],
+                        correct: 1,
+                        explanation: "Colony Collapse Disorder (CCD) is specifically described as when entire bee colonies abandon their hives."
+                    },
+                    {
+                        question: "According to the passage, what fraction of our food depends on bee pollination?",
+                        options: [
+                            "One-quarter",
+                            "One-half",
+                            "One-third",
+                            "Two-thirds"
+                        ],
+                        correct: 2,
+                        explanation: "The passage states that bees pollinate about one-third of the food we eat."
+                    },
+                    {
+                        question: "Which of these is NOT mentioned as a potential cause of CCD?",
+                        options: [
+                            "Climate change",
+                            "Overpopulation of bees",
+                            "Pesticides",
+                            "Disease"
+                        ],
+                        correct: 1,
+                        explanation: "Overpopulation of bees is not mentioned. The passage lists pesticides, disease, climate change, and habitat loss as potential causes."
+                    }
+                ]
+            },
+            {
+                title: "The Art of Memory Palaces",
+                text: "Memory palaces, also known as the method of loci, is an ancient technique used to improve memory. The method involves associating information with specific locations in a familiar place, such as your home. To use this technique, you mentally walk through your chosen location and place the items you want to remember in specific spots. For example, if you need to remember a grocery list, you might place milk by your front door, bread on the kitchen counter, and apples in the living room. When you need to recall the information, you simply take a mental walk through your memory palace. This technique was widely used by ancient Greek and Roman orators to memorize long speeches. Modern memory champions still use variations of this method to perform incredible feats of memorization, such as memorizing the order of multiple decks of cards or thousands of random numbers.",
+                questions: [
+                    {
+                        question: "What is another name for the memory palace technique?",
+                        options: [
+                            "The method of association",
+                            "The method of loci",
+                            "The method of visualization",
+                            "The method of repetition"
+                        ],
+                        correct: 1,
+                        explanation: "The passage clearly states that memory palaces are 'also known as the method of loci.'"
+                    },
+                    {
+                        question: "How does the memory palace technique work?",
+                        options: [
+                            "By repeating information many times",
+                            "By writing information down repeatedly",
+                            "By associating information with specific locations",
+                            "By creating rhymes with the information"
+                        ],
+                        correct: 2,
+                        explanation: "The technique involves 'associating information with specific locations in a familiar place.'"
+                    },
+                    {
+                        question: "Who historically used this technique for memorizing speeches?",
+                        options: [
+                            "Ancient Egyptian priests",
+                            "Medieval scholars",
+                            "Ancient Greek and Roman orators",
+                            "Renaissance artists"
+                        ],
+                        correct: 2,
+                        explanation: "The passage states that 'ancient Greek and Roman orators' used this technique to memorize long speeches."
+                    }
+                ]
+            },
+            {
+                title: "The Future of Urban Transportation",
+                text: "Cities around the world are reimagining transportation to address growing populations and environmental concerns. Electric buses are replacing diesel vehicles in many metropolitan areas, reducing air pollution and noise. Bike-sharing programs have exploded in popularity, with cities like Amsterdam and Copenhagen leading the way in creating extensive cycling infrastructure. Some cities are experimenting with autonomous vehicle networks that could reduce traffic congestion and accidents caused by human error. Underground pneumatic tube systems, once used only for mail delivery, are being considered for passenger transport in dense urban areas. However, the most promising development may be the integration of different transportation modes through smart apps that allow users to seamlessly plan trips combining walking, biking, public transit, and ride-sharing. This integrated approach could make car ownership unnecessary for many urban residents, fundamentally changing how we think about city mobility.",
+                questions: [
+                    {
+                        question: "What is the main focus of the passage?",
+                        options: [
+                            "The problems with current transportation",
+                            "New developments in urban transportation",
+                            "The history of city planning",
+                            "Environmental benefits of cycling"
+                        ],
+                        correct: 1,
+                        explanation: "The passage focuses on how cities are 'reimagining transportation' and discusses various new developments."
+                    },
+                    {
+                        question: "Which cities are mentioned as leaders in cycling infrastructure?",
+                        options: [
+                            "London and Paris",
+                            "Amsterdam and Copenhagen",
+                            "Berlin and Stockholm",
+                            "Tokyo and Seoul"
+                        ],
+                        correct: 1,
+                        explanation: "The passage specifically mentions 'Amsterdam and Copenhagen leading the way in creating extensive cycling infrastructure.'"
+                    },
+                    {
+                        question: "According to the passage, what might make car ownership unnecessary?",
+                        options: [
+                            "Higher fuel prices",
+                            "Better public transportation alone",
+                            "Integration of different transportation modes through smart apps",
+                            "More parking restrictions"
+                        ],
+                        correct: 2,
+                        explanation: "The passage states that the integrated approach through smart apps 'could make car ownership unnecessary for many urban residents.'"
+                    }
+                ]
+            }
+        ];
+
+        function initGame() {
+            // Flatten all questions into a single array
+            passages.forEach((passage, passageIndex) => {
+                passage.questions.forEach((question, questionIndex) => {
+                    gameData.push({
+                        passageIndex: passageIndex,
+                        questionIndex: questionIndex,
+                        passage: passage,
+                        question: question
+                    });
+                });
+            });
+            totalQuestions = gameData.length;
+        }
+
+        function startGame() {
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            startTimer();
+            showQuestion();
+        }
+
+        function startTimer() {
+            timer = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                document.getElementById('timer').textContent = `Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function showQuestion() {
+            if (currentQuestion >= totalQuestions) {
+                endGame();
+                return;
+            }
+
+            const current = gameData[currentQuestion];
+            const container = document.getElementById('passageContainer');
+            
+            // Update progress
+            const progress = ((currentQuestion) / totalQuestions) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            
+            // Update score
+            document.getElementById('scoreBoard').textContent = `Score: ${score}/${currentQuestion}`;
+
+            container.innerHTML = `
+                <div class="passage">
+                    <h3>${current.passage.title}</h3>
+                    <p>${current.passage.text}</p>
+                </div>
+                <div class="question-container">
+                    <div class="question">Question ${currentQuestion + 1}: ${current.question.question}</div>
+                    <div class="options">
+                        ${current.question.options.map((option, index) => `
+                            <div class="option" onclick="selectOption(${index})">
+                                <input type="radio" name="q${currentQuestion}" value="${index}" id="option${index}">
+                                <label for="option${index}">${option}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="feedback" id="feedback"></div>
+                </div>
+            `;
+        }
+
+        function selectOption(selectedIndex) {
+            const current = gameData[currentQuestion];
+            const options = document.querySelectorAll('.option');
+            const feedback = document.getElementById('feedback');
+            const nextBtn = document.getElementById('nextBtn');
+
+            // Disable all options
+            options.forEach((option, index) => {
+                option.style.pointerEvents = 'none';
+                if (index === current.question.correct) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && index !== current.question.correct) {
+                    option.classList.add('incorrect');
+                }
+            });
+
+            // Show feedback
+            if (selectedIndex === current.question.correct) {
+                score++;
+                feedback.textContent = "Correct! " + current.question.explanation;
+                feedback.className = 'feedback correct';
+            } else {
+                feedback.textContent = "Incorrect. " + current.question.explanation;
+                feedback.className = 'feedback incorrect';
+            }
+            
+            feedback.style.display = 'block';
+            nextBtn.style.display = 'inline-block';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            document.getElementById('nextBtn').style.display = 'none';
+            showQuestion();
+        }
+
+        function endGame() {
+            clearInterval(timer);
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').style.display = 'block';
+            
+            const finalScore = document.getElementById('finalScore');
+            const performanceFeedback = document.getElementById('performanceFeedback');
+            
+            const percentage = Math.round((score / totalQuestions) * 100);
+            finalScore.textContent = `You scored ${score} out of ${totalQuestions} (${percentage}%)`;
+            
+            let feedback = '';
+            if (percentage >= 90) {
+                feedback = '🌟 Excellent! You have outstanding reading comprehension skills.';
+            } else if (percentage >= 80) {
+                feedback = '👍 Great job! Your reading comprehension is very good.';
+            } else if (percentage >= 70) {
+                feedback = '📖 Good work! Keep practicing to improve further.';
+            } else if (percentage >= 60) {
+                feedback = '💪 Not bad! Focus on reading more carefully and practice active reading strategies.';
+            } else {
+                feedback = '📚 Keep practicing! Try reading passages more slowly and taking notes on key points.';
+            }
+            
+            performanceFeedback.innerHTML = `
+                <h3>Performance Analysis:</h3>
+                <p>${feedback}</p>
+                <p><strong>Tips for improvement:</strong></p>
+                <ul style="text-align: left; margin: 10px 0;">
+                    <li>Read each passage carefully before looking at questions</li>
+                    <li>Look for key details and main ideas</li>
+                    <li>Pay attention to signal words like "however," "therefore," "because"</li>
+                    <li>Practice identifying cause and effect relationships</li>
+                    <li>Always refer back to the passage for answers</li>
+                </ul>
+            `;
+        }
+
+        function restartGame() {
+            currentQuestion = 0;
+            score = 0;
+            timeLeft = 1800;
+            studentName = '';
+            gameStartTime = null;
+            gameEndTime = null;
+            detailedResults = [];
+            document.getElementById('resultsScreen').style.display = 'none';
+            document.getElementById('startScreen').classList.remove('hidden');
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('timer').textContent = 'Time: 30:00';
+            document.getElementById('scoreBoard').textContent = 'Score: 0/0';
+            document.getElementById('studentName').value = '';
+        }
+
+        // Results export functions
+        function generateReport() {
+            const percentage = Math.round((score / totalQuestions) * 100);
+            const timeSpent = Math.round((gameEndTime - gameStartTime) / 1000 / 60); // minutes
+            
+            let report = `READING COMPREHENSION ASSESSMENT REPORT\n`;
+            report += `==========================================\n\n`;
+            report += `Student Name: ${studentName}\n`;
+            report += `Date: ${gameStartTime.toLocaleDateString()}\n`;
+            report += `Time Started: ${gameStartTime.toLocaleTimeString()}\n`;
+            report += `Time Completed: ${gameEndTime.toLocaleTimeString()}\n`;
+            report += `Duration: ${timeSpent} minutes\n\n`;
+            
+            report += `OVERALL PERFORMANCE:\n`;
+            report += `Score: ${score}/${totalQuestions} (${percentage}%)\n`;
+            
+            let performanceLevel = '';
+            if (percentage >= 90) performanceLevel = 'Excellent';
+            else if (percentage >= 80) performanceLevel = 'Good';
+            else if (percentage >= 70) performanceLevel = 'Satisfactory';
+            else if (percentage >= 60) performanceLevel = 'Needs Improvement';
+            else performanceLevel = 'Requires Support';
+            
+            report += `Performance Level: ${performanceLevel}\n\n`;
+            
+            report += `DETAILED RESULTS:\n`;
+            report += `-----------------\n`;
+            
+            detailedResults.forEach((result, index) => {
+                report += `\nQuestion ${result.questionNumber}: ${result.isCorrect ? '✓ CORRECT' : '✗ INCORRECT'}\n`;
+                report += `Passage: ${result.passage}\n`;
+                report += `Question: ${result.question}\n`;
+                report += `Student Answer: ${result.selectedAnswer}\n`;
+                if (!result.isCorrect) {
+                    report += `Correct Answer: ${result.correctAnswer}\n`;
+                }
+                report += `Explanation: ${result.explanation}\n`;
+            });
+            
+            report += `\n\nRECOMMENDations:\n`;
+            report += `----------------\n`;
+            if (percentage >= 90) {
+                report += `• Continue challenging reading materials\n• Consider advanced comprehension strategies\n• Mentor other students`;
+            } else if (percentage >= 80) {
+                report += `• Practice with more complex texts\n• Focus on inference and critical thinking\n• Work on time management`;
+            } else if (percentage >= 70) {
+                report += `• Practice active reading strategies\n• Focus on identifying main ideas\n• Improve vocabulary knowledge`;
+            } else {
+                report += `• Start with shorter, simpler texts\n• Practice basic comprehension skills\n• Consider additional reading support\n• Focus on vocabulary building`;
+            }
+            
+            return report;
+        }
+
+        function downloadResults() {
+            const report = generateReport();
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const fileName = `${studentName.replace(/\s+/g, '_')}_${studentClass.replace(/\s+/g, '_')}_Reading_Assessment_${gameStartTime.toISOString().split('T')[0]}.txt`;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function copyResults() {
+            const report = generateReport();
+            navigator.clipboard.writeText(report).then(() => {
+                alert(`Results copied to clipboard!\n\nYou can now:\n1. Open your email or school portal\n2. Paste the results (Ctrl+V or Cmd+V)\n3. Send to your teacher: ${teacherEmail}`);
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = report;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert(`Results copied to clipboard!\n\nYou can now:\n1. Open your email or school portal\n2. Paste the results (Ctrl+V or Cmd+V)\n3. Send to your teacher: ${teacherEmail}`);
+            });
+        }
+
+        function emailResults() {
+            emailToTeacher(); // Use the new emailToTeacher function
+        }
+
+        // Initialize the game when page loads
+        window.onload = function() {
+            initGame();
+        };
+    </script>
+</body>
+</html>
